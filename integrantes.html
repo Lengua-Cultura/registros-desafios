@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registro de Integrantes - Desafío Comunitario</title>
+<style>
+  :root {
+    --azul: #0b4f6c;
+    --azul-claro: #e8f1f5;
+    --verde: #2e7d32;
+    --gris: #6b7280;
+    --rojo: #c0392b;
+    --borde: #d0d7de;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    background: #f5f7f8;
+    margin: 0;
+    padding: 20px;
+    color: #1f2937;
+  }
+  .container {
+    max-width: 780px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    padding: 24px;
+  }
+  h1 {
+    font-size: 1.3rem;
+    color: var(--azul);
+    margin-top: 0;
+    border-bottom: 2px solid var(--azul-claro);
+    padding-bottom: 12px;
+  }
+  .subtitulo {
+    color: var(--gris);
+    font-size: 0.9rem;
+    margin-top: -8px;
+    margin-bottom: 20px;
+  }
+  label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: #374151;
+  }
+  input[type="text"], select {
+    width: 100%;
+    padding: 9px 10px;
+    border: 1px solid var(--borde);
+    border-radius: 6px;
+    font-size: 0.95rem;
+    margin-bottom: 14px;
+    background: #fff;
+  }
+  input:focus, select:focus {
+    outline: none;
+    border-color: var(--azul);
+    box-shadow: 0 0 0 2px rgba(11,79,108,0.15);
+  }
+  .grupo-field {
+    margin-bottom: 6px;
+  }
+  .integrante-card {
+    border: 1px solid var(--borde);
+    border-left: 4px solid var(--azul);
+    border-radius: 8px;
+    padding: 16px 16px 4px 16px;
+    margin-bottom: 16px;
+    background: #fafbfc;
+    position: relative;
+  }
+  .integrante-card h3 {
+    font-size: 0.95rem;
+    color: var(--azul);
+    margin: 0 0 12px 0;
+  }
+  .fila-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .fila-2col-chico {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .residencia-titulo {
+    font-size: 0.8rem;
+    color: var(--gris);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin: 4px 0 8px 0;
+  }
+  .btn-eliminar {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: none;
+    border: none;
+    color: var(--rojo);
+    font-size: 0.8rem;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+  .btn-eliminar:hover { color: #922b21; }
+  .btn-agregar {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background: var(--azul-claro);
+    color: var(--azul);
+    border: 2px dashed var(--azul);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 20px;
+  }
+  .btn-agregar:hover { background: #d7e8ef; }
+  .btn-enviar {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    background: var(--verde);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .btn-enviar:hover { background: #256428; }
+  .aviso {
+    font-size: 0.78rem;
+    color: var(--gris);
+    background: var(--azul-claro);
+    border-radius: 6px;
+    padding: 10px 12px;
+    margin-bottom: 18px;
+    line-height: 1.4;
+  }
+  .contador {
+    font-size: 0.85rem;
+    color: var(--gris);
+    margin-bottom: 12px;
+  }
+  #mensajeEstado {
+    display: none;
+    margin-top: 14px;
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+  }
+  #mensajeEstado.exito {
+    display: block;
+    background: #e6f4ea;
+    color: var(--verde);
+    border: 1px solid #b7dfc0;
+  }
+  .seccion-titulo {
+    font-size: 1.05rem;
+    color: var(--azul);
+    margin: 28px 0 14px 0;
+    padding-top: 18px;
+    border-top: 2px solid var(--azul-claro);
+  }
+  textarea {
+    width: 100%;
+    padding: 9px 10px;
+    border: 1px solid var(--borde);
+    border-radius: 6px;
+    font-size: 0.95rem;
+    margin-bottom: 14px;
+    background: #fff;
+    font-family: inherit;
+    resize: vertical;
+  }
+  textarea:focus {
+    outline: none;
+    border-color: var(--azul);
+    box-shadow: 0 0 0 2px rgba(11,79,108,0.15);
+  }
+  .checkbox-grupo {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    padding: 10px 0 4px 0;
+    margin-bottom: 6px;
+  }
+  .chk {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 400;
+    font-size: 0.92rem;
+    color: #1f2937;
+    margin-bottom: 0;
+  }
+  .chk input {
+    width: auto;
+    margin: 0;
+  }
+  .subcampo-cascada {
+    margin-top: 4px;
+    margin-bottom: 14px;
+    padding: 12px;
+    background: var(--azul-claro);
+    border-radius: 6px;
+  }
+  .subcampo-cascada label {
+    color: var(--azul);
+  }
+  details.ayuda-objetivo {
+    background: var(--azul-claro);
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin-bottom: 10px;
+    font-size: 0.85rem;
+    color: #374151;
+    line-height: 1.5;
+  }
+  details.ayuda-objetivo summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--azul);
+  }
+  details.ayuda-objetivo ul {
+    margin: 6px 0;
+    padding-left: 20px;
+  }
+  details.ayuda-objetivo .ejemplo {
+    font-style: italic;
+    margin-top: 8px;
+  }
+  .tabla-poblacion-wrap {
+    overflow-x: auto;
+    margin-bottom: 16px;
+  }
+  table.tabla-poblacion {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+    min-width: 620px;
+  }
+  table.tabla-poblacion th, table.tabla-poblacion td {
+    border: 1px solid var(--borde);
+    padding: 6px 4px;
+    text-align: center;
+  }
+  table.tabla-poblacion th {
+    background: var(--azul-claro);
+    color: var(--azul);
+    font-weight: 600;
+    font-size: 0.75rem;
+  }
+  table.tabla-poblacion td.etiqueta-fila {
+    font-weight: 600;
+    background: #fafbfc;
+    text-align: left;
+    padding-left: 10px;
+  }
+  table.tabla-poblacion input.campo-poblacion {
+    width: 56px;
+    padding: 4px;
+    margin-bottom: 0;
+    text-align: center;
+    border: 1px solid var(--borde);
+    border-radius: 4px;
+  }
+  table.tabla-poblacion td.celda-total {
+    background: #f0f4f6;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Registro del Desafío Comunitario</h1>
+  <p class="subtitulo">Carrera de Lengua y Cultura &mdash; Integrantes, Comunidad de Aprendizaje y Objetivo</p>
+
+  <div class="aviso">
+    Llena este formulario con los datos de <strong>todos los integrantes</strong> del colectivo, incluyéndote a ti mismo/a.
+    Los datos de residencia se refieren al lugar donde vive actualmente cada estudiante, no a la comunidad de aprendizaje del Desafío.
+  </div>
+
+  <div class="grupo-field">
+    <label for="nombreColectivo">Nombre del colectivo</label>
+    <input type="text" id="nombreColectivo" placeholder="Ej: Kawsay Warmi">
+  </div>
+
+  <div id="listaIntegrantes"></div>
+
+  <p class="contador"><span id="contadorTexto">1 integrante agregado</span></p>
+
+  <button type="button" class="btn-agregar" id="btnAgregar">+ Agregar integrante</button>
+
+  <h2 class="seccion-titulo">Liderazgo y categoría</h2>
+
+  <div class="grupo-field">
+    <label for="selectLider">Líder del colectivo</label>
+    <select id="selectLider">
+      <option value="">Agrega integrantes primero...</option>
+    </select>
+  </div>
+
+  <div class="grupo-field">
+    <label for="liderTelefono">Número de teléfono del líder</label>
+    <input type="text" id="liderTelefono" placeholder="Ej: 099 999 9999">
+  </div>
+
+  <h2 class="seccion-titulo">Comunidad de Aprendizaje</h2>
+
+  <div class="grupo-field">
+    <label for="nombreComunidad">Nombre de la comunidad de aprendizaje</label>
+    <input type="text" id="nombreComunidad" placeholder="Ej: Comunidad San Pedro">
+  </div>
+
+  <div class="fila-2">
+    <div>
+      <label for="comunidadUbicacion">Comunidad/sector/barrio/recinto</label>
+      <input type="text" id="comunidadUbicacion" placeholder="Ej: Sector El Tambo">
+    </div>
+    <div>
+      <label for="comunidadParroquia">Parroquia</label>
+      <input type="text" id="comunidadParroquia" placeholder="Ej: Sinincay">
+    </div>
+  </div>
+  <div class="fila-2">
+    <div>
+      <label for="comunidadCanton">Cantón</label>
+      <input type="text" id="comunidadCanton" placeholder="Ej: Cuenca">
+    </div>
+    <div>
+      <label for="comunidadProvincia">Provincia</label>
+      <select id="comunidadProvincia">
+        <option value="">Selecciona...</option>
+        <option>Azuay</option>
+        <option>Bolívar</option>
+        <option>Cañar</option>
+        <option>Carchi</option>
+        <option>Chimborazo</option>
+        <option>Cotopaxi</option>
+        <option>El Oro</option>
+        <option>Esmeraldas</option>
+        <option>Galápagos</option>
+        <option>Guayas</option>
+        <option>Imbabura</option>
+        <option>Loja</option>
+        <option>Los Ríos</option>
+        <option>Manabí</option>
+        <option>Morona Santiago</option>
+        <option>Napo</option>
+        <option>Orellana</option>
+        <option>Pastaza</option>
+        <option>Pichincha</option>
+        <option>Santa Elena</option>
+        <option>Santo Domingo de los Tsáchilas</option>
+        <option>Sucumbíos</option>
+        <option>Tungurahua</option>
+        <option>Zamora Chinchipe</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="grupo-field">
+    <label for="comunidadArea">Urbana, periurbana o rural</label>
+    <select id="comunidadArea">
+      <option value="">Selecciona...</option>
+      <option>Urbana</option>
+      <option>Periurbana</option>
+      <option>Rural</option>
+    </select>
+  </div>
+
+  <div class="grupo-field">
+    <label>Autoidentificación de la población de la comunidad de aprendizaje</label>
+    <p class="subtitulo" style="margin-top:-2px; margin-bottom:8px; font-size:0.8rem;">Puede elegir más de una opción.</p>
+    <div class="checkbox-grupo" id="grupoAutoidentificacion">
+      <label class="chk"><input type="checkbox" class="auto-check" value="Mestizo"> Mestizo</label>
+      <label class="chk"><input type="checkbox" class="auto-check" value="Blanco"> Blanco</label>
+      <label class="chk"><input type="checkbox" class="auto-check" value="Montubio"> Montubio</label>
+      <label class="chk"><input type="checkbox" class="auto-check" value="Afroecuatoriano"> Afroecuatoriano</label>
+      <label class="chk"><input type="checkbox" class="auto-check" id="chkIndigena" value="Indígena"> Indígena</label>
+    </div>
+
+    <div class="subcampo-cascada" id="bloqueNacionalidad" style="display:none;">
+      <label>Nacionalidad indígena</label>
+      <p class="subtitulo" style="margin-top:-2px; margin-bottom:8px; font-size:0.8rem;">Puede elegir más de una opción.</p>
+      <div class="checkbox-grupo" id="grupoNacionalidad">
+        <label class="chk"><input type="checkbox" class="nacionalidad-check" value="Tsa'chila"> Tsa'chila</label>
+        <label class="chk"><input type="checkbox" class="nacionalidad-check" value="Eperara"> Eperara</label>
+        <label class="chk"><input type="checkbox" class="nacionalidad-check" value="Chachi"> Chachi</label>
+        <label class="chk"><input type="checkbox" class="nacionalidad-check" value="Awá"> Awá</label>
+        <label class="chk"><input type="checkbox" class="nacionalidad-check" value="A'i Kofán"> A'i Kofán</label>
+        <label class="chk"><input type="checkbox" class="nacionalidad-check" value="Kichwa Amazónico"> Kichwa Amazónico</label>
+        <label class="chk"><input type="checkbox" class="nacionalidad-check" value="Shuar"> Shuar</label>
+        <label class="chk"><input type="checkbox" class="nacionalidad-check" value="Siona"> Siona</label>
+        <label class="chk"><input type="checkbox" class="nacionalidad-check" value="Siekoppai"> Siekoppai</label>
+        <label class="chk"><input type="checkbox" class="nacionalidad-check" value="Shiwiar"> Shiwiar</label>
+        <label class="chk"><input type="checkbox" class="nacionalidad-check" value="Waodani"> Waodani</label>
+        <label class="chk"><input type="checkbox" class="nacionalidad-check" value="Achuar"> Achuar</label>
+        <label class="chk"><input type="checkbox" class="nacionalidad-check" value="Andowa"> Andowa</label>
+        <label class="chk"><input type="checkbox" class="nacionalidad-check" value="Sapara"> Sapara</label>
+        <label class="chk"><input type="checkbox" class="nacionalidad-check" value="Quijos"> Quijos</label>
+        <label class="chk"><input type="checkbox" class="nacionalidad-check" value="Huacavilca"> Huacavilca</label>
+        <label class="chk"><input type="checkbox" class="nacionalidad-check" value="Manta"> Manta</label>
+        <label class="chk"><input type="checkbox" class="nacionalidad-check" id="chkKichwaAndino" value="Kichwa Andino"> Kichwa Andino</label>
+      </div>
+
+      <div class="subcampo-cascada" id="bloquePuebloKichwa" style="display:none; background:#fff; border:1px solid var(--borde);">
+        <label>Pueblo (Kichwa Andino)</label>
+        <p class="subtitulo" style="margin-top:-2px; margin-bottom:8px; font-size:0.8rem;">Puede elegir más de una opción.</p>
+        <div class="checkbox-grupo" id="grupoPuebloKichwa">
+          <label class="chk"><input type="checkbox" class="pueblo-kichwa-check" value="Panzaleo"> Panzaleo</label>
+          <label class="chk"><input type="checkbox" class="pueblo-kichwa-check" value="Chibuleo"> Chibuleo</label>
+          <label class="chk"><input type="checkbox" class="pueblo-kichwa-check" value="Salasaka"> Salasaka</label>
+          <label class="chk"><input type="checkbox" class="pueblo-kichwa-check" value="Kisapincha"> Kisapincha</label>
+          <label class="chk"><input type="checkbox" class="pueblo-kichwa-check" value="Waranka"> Waranka</label>
+          <label class="chk"><input type="checkbox" class="pueblo-kichwa-check" value="Kayambi"> Kayambi</label>
+          <label class="chk"><input type="checkbox" class="pueblo-kichwa-check" value="Otavalo"> Otavalo</label>
+          <label class="chk"><input type="checkbox" class="pueblo-kichwa-check" value="Natabuela"> Natabuela</label>
+          <label class="chk"><input type="checkbox" class="pueblo-kichwa-check" value="Tomabela"> Tomabela</label>
+          <label class="chk"><input type="checkbox" class="pueblo-kichwa-check" value="Palta"> Palta</label>
+          <label class="chk"><input type="checkbox" class="pueblo-kichwa-check" value="Kitukara"> Kitukara</label>
+          <label class="chk"><input type="checkbox" class="pueblo-kichwa-check" value="Caranqui"> Caranqui</label>
+          <label class="chk"><input type="checkbox" class="pueblo-kichwa-check" value="Puruwa"> Puruwa</label>
+          <label class="chk"><input type="checkbox" class="pueblo-kichwa-check" value="Saraguro"> Saraguro</label>
+          <label class="chk"><input type="checkbox" class="pueblo-kichwa-check" value="Cañari"> Cañari</label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="seccion-titulo">Representante de la comunidad</h2>
+
+  <div class="fila-2">
+    <div>
+      <label for="repNombre">Nombre y Apellidos</label>
+      <input type="text" id="repNombre" placeholder="Nombre completo">
+    </div>
+    <div>
+      <label for="repCargo">Cargo</label>
+      <input type="text" id="repCargo" placeholder="Ej: Presidente/a comunitario/a">
+    </div>
+  </div>
+  <div class="fila-2">
+    <div>
+      <label for="repTelefono">Teléfono</label>
+      <input type="text" id="repTelefono" placeholder="Ej: 099 999 9999">
+    </div>
+    <div>
+      <label for="repCorreo">Correo electrónico</label>
+      <input type="text" id="repCorreo" placeholder="correo@ejemplo.com">
+    </div>
+  </div>
+
+  <h2 class="seccion-titulo">Situación, tema y objetivo del Desafío</h2>
+
+  <div class="grupo-field">
+    <label for="campoSituacion">Situación, problema o necesidad identificada con la comunidad</label>
+    <textarea id="campoSituacion" rows="3" placeholder="Describe brevemente el problema o necesidad real que aborda el Desafío..."></textarea>
+  </div>
+
+  <div class="grupo-field">
+    <label for="campoTema">Tema que abordará el Desafío Comunitario en el presente ciclo</label>
+    <input type="text" id="campoTema" placeholder="Ej. Revitalización de las prácticas de oralidad.">
+  </div>
+
+  <div class="grupo-field">
+    <label for="campoObjetivo">Objetivo(s) que proponen alcanzar</label>
+
+    <details class="ayuda-objetivo" open>
+      <summary>Cómo redactar un buen objetivo (enfoque IAP) — clic para ver</summary>
+      <p>Un buen objetivo responde a tres preguntas a la vez: <strong>¿Con quién?</strong> + <strong>¿Qué se transforma?</strong> + <strong>¿Para qué?</strong>. No es "estudiar" ni "analizar" — es actuar junto a la comunidad para generar un cambio concreto.</p>
+      <p>Usa verbos de acción conjunta, no verbos distantes:</p>
+      <ul>
+        <li>Construir colectivamente...</li>
+        <li>Fortalecer junto a la comunidad...</li>
+        <li>Sistematizar saberes con...</li>
+        <li>Generar procesos participativos de...</li>
+        <li>Recuperar conocimientos ancestrales a través de...</li>
+        <li>Co-crear con los actores...</li>
+      </ul>
+      <p>No puede faltar: la comunidad como <strong>sujeto activo</strong> (con ellos, no sobre ellos), un <strong>resultado transformador</strong> (no solo un informe), y el <strong>contexto situado</strong> (territorio, comunidad, problema real).</p>
+      <p class="ejemplo">Ejemplo: "Construir colectivamente con la familia shuar de la reserva un recorrido interpretativo del bosque húmedo tropical que recupere y visibilice su cosmovisión como forma de fortalecer la identidad cultural y generar una alternativa económica comunitaria."</p>
+    </details>
+
+    <textarea id="campoObjetivo" rows="4" placeholder="Ej: Construir colectivamente con... un/una ... que ... para fortalecer/generar/recuperar..."></textarea>
+  </div>
+
+  <div class="grupo-field" id="bloqueColectivoNuevo" style="display:none;">
+    <label>¿El colectivo es nuevo este ciclo?</label>
+    <div class="checkbox-grupo">
+      <label class="chk"><input type="radio" name="colectivoNuevo" id="radioNuevoSi" value="si"> Sí</label>
+      <label class="chk"><input type="radio" name="colectivoNuevo" id="radioNuevoNo" value="no"> No</label>
+    </div>
+    <div class="subcampo-cascada" id="bloqueNombreColectivoAnterior" style="display:none;">
+      <label for="campoColectivoAnterior">Cuéntanos, ¿en qué colectivo estuviste el ciclo pasado?</label>
+      <input type="text" id="campoColectivoAnterior" placeholder="Nombre del colectivo anterior">
+    </div>
+  </div>
+
+  <h2 class="seccion-titulo">Población beneficiaria</h2>
+  <div class="aviso">
+    Número de personas de la comunidad que serán beneficiarias directas de las actividades del Desafío, por grupo de edad y sexo.
+  </div>
+
+  <div class="tabla-poblacion-wrap">
+    <table class="tabla-poblacion">
+      <thead>
+        <tr>
+          <th>Sexo</th>
+          <th>Niños<br>0-5 años</th>
+          <th>Niños<br>6-11 años</th>
+          <th>Adolescentes<br>12-17 años</th>
+          <th>Adultos<br>18-25 años</th>
+          <th>Adultos<br>26-64 años</th>
+          <th>Adultos mayores<br>65+ años</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="etiqueta-fila">Hombres</td>
+          <td><input type="text" inputmode="numeric" class="campo-poblacion" data-sexo="hombres" data-rango="r0_5" value="0"></td>
+          <td><input type="text" inputmode="numeric" class="campo-poblacion" data-sexo="hombres" data-rango="r6_11" value="0"></td>
+          <td><input type="text" inputmode="numeric" class="campo-poblacion" data-sexo="hombres" data-rango="r12_17" value="0"></td>
+          <td><input type="text" inputmode="numeric" class="campo-poblacion" data-sexo="hombres" data-rango="r18_25" value="0"></td>
+          <td><input type="text" inputmode="numeric" class="campo-poblacion" data-sexo="hombres" data-rango="r26_64" value="0"></td>
+          <td><input type="text" inputmode="numeric" class="campo-poblacion" data-sexo="hombres" data-rango="r65mas" value="0"></td>
+        </tr>
+        <tr>
+          <td class="etiqueta-fila">Mujeres</td>
+          <td><input type="text" inputmode="numeric" class="campo-poblacion" data-sexo="mujeres" data-rango="r0_5" value="0"></td>
+          <td><input type="text" inputmode="numeric" class="campo-poblacion" data-sexo="mujeres" data-rango="r6_11" value="0"></td>
+          <td><input type="text" inputmode="numeric" class="campo-poblacion" data-sexo="mujeres" data-rango="r12_17" value="0"></td>
+          <td><input type="text" inputmode="numeric" class="campo-poblacion" data-sexo="mujeres" data-rango="r18_25" value="0"></td>
+          <td><input type="text" inputmode="numeric" class="campo-poblacion" data-sexo="mujeres" data-rango="r26_64" value="0"></td>
+          <td><input type="text" inputmode="numeric" class="campo-poblacion" data-sexo="mujeres" data-rango="r65mas" value="0"></td>
+        </tr>
+        <tr>
+          <td class="etiqueta-fila">Total</td>
+          <td class="celda-total" id="total_r0_5">0</td>
+          <td class="celda-total" id="total_r6_11">0</td>
+          <td class="celda-total" id="total_r12_17">0</td>
+          <td class="celda-total" id="total_r18_25">0</td>
+          <td class="celda-total" id="total_r26_64">0</td>
+          <td class="celda-total" id="total_r65mas">0</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <button type="button" class="btn-enviar" id="btnEnviar">Enviar registro</button>
+
+  <div id="mensajeEstado"></div>
+</div>
+
+<template id="plantillaIntegrante">
+  <div class="integrante-card">
+    <button type="button" class="btn-eliminar">Eliminar</button>
+    <h3>Integrante <span class="numero-integrante"></span></h3>
+
+    <div class="fila-2">
+      <div>
+        <label>Apellidos</label>
+        <input type="text" class="campo-apellidos" placeholder="Apellidos">
+      </div>
+      <div>
+        <label>Nombres</label>
+        <input type="text" class="campo-nombres" placeholder="Nombres">
+      </div>
+    </div>
+
+    <div class="fila-2">
+      <div>
+        <label>Ciclo</label>
+        <select class="campo-ciclo">
+          <option value="">Selecciona...</option>
+          <option value="1">1°</option>
+          <option value="2">2°</option>
+          <option value="3">3°</option>
+          <option value="4">4°</option>
+          <option value="5">5°</option>
+          <option value="6">6°</option>
+          <option value="7">7°</option>
+          <option value="8">8°</option>
+        </select>
+      </div>
+      <div>
+        <label>Paralelo</label>
+        <select class="campo-paralelo">
+          <option value="">Selecciona...</option>
+          <option value="A">A</option>
+          <option value="B">B</option>
+          <option value="C">C</option>
+        </select>
+      </div>
+    </div>
+
+    <p class="residencia-titulo">Lugar de residencia</p>
+    <div class="fila-2">
+      <div>
+        <label>Comunidad/sector/barrio/recinto</label>
+        <input type="text" class="campo-comunidad" placeholder="Ej: Sector San José">
+      </div>
+      <div>
+        <label>Parroquia</label>
+        <input type="text" class="campo-parroquia" placeholder="Ej: Sinincay">
+      </div>
+    </div>
+    <div class="fila-2">
+      <div>
+        <label>Cantón</label>
+        <input type="text" class="campo-canton" placeholder="Ej: Cuenca">
+      </div>
+      <div>
+        <label>Provincia</label>
+        <select class="campo-provincia">
+          <option value="">Selecciona...</option>
+          <option>Azuay</option>
+          <option>Bolívar</option>
+          <option>Cañar</option>
+          <option>Carchi</option>
+          <option>Chimborazo</option>
+          <option>Cotopaxi</option>
+          <option>El Oro</option>
+          <option>Esmeraldas</option>
+          <option>Galápagos</option>
+          <option>Guayas</option>
+          <option>Imbabura</option>
+          <option>Loja</option>
+          <option>Los Ríos</option>
+          <option>Manabí</option>
+          <option>Morona Santiago</option>
+          <option>Napo</option>
+          <option>Orellana</option>
+          <option>Pastaza</option>
+          <option>Pichincha</option>
+          <option>Santa Elena</option>
+          <option>Santo Domingo de los Tsáchilas</option>
+          <option>Sucumbíos</option>
+          <option>Tungurahua</option>
+          <option>Zamora Chinchipe</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+const listaIntegrantes = document.getElementById('listaIntegrantes');
+const plantilla = document.getElementById('plantillaIntegrante');
+const contadorTexto = document.getElementById('contadorTexto');
+
+function actualizarNumeracion() {
+  const tarjetas = listaIntegrantes.querySelectorAll('.integrante-card');
+  tarjetas.forEach((tarjeta, i) => {
+    tarjeta.querySelector('.numero-integrante').textContent = i + 1;
+  });
+  contadorTexto.textContent = tarjetas.length === 1
+    ? '1 integrante agregado'
+    : `${tarjetas.length} integrantes agregados`;
+
+  // No permitir eliminar si solo queda 1 integrante
+  const botonesEliminar = listaIntegrantes.querySelectorAll('.btn-eliminar');
+  botonesEliminar.forEach(btn => {
+    btn.style.display = tarjetas.length > 1 ? 'block' : 'none';
+  });
+}
+
+function agregarIntegrante() {
+  const nodo = plantilla.content.cloneNode(true);
+  const tarjeta = nodo.querySelector('.integrante-card');
+  tarjeta.querySelector('.btn-eliminar').addEventListener('click', () => {
+    tarjeta.remove();
+    actualizarNumeracion();
+    actualizarSelectLider();
+    actualizarVisibilidadColectivoNuevo();
+  });
+  listaIntegrantes.appendChild(nodo);
+  actualizarNumeracion();
+  actualizarSelectLider();
+  actualizarVisibilidadColectivoNuevo();
+}
+
+document.getElementById('btnAgregar').addEventListener('click', agregarIntegrante);
+
+// ---- Líder del colectivo: se llena dinámicamente con los integrantes ingresados ----
+const selectLider = document.getElementById('selectLider');
+
+function actualizarSelectLider() {
+  const valorPrevio = selectLider.value;
+  const tarjetas = listaIntegrantes.querySelectorAll('.integrante-card');
+  selectLider.innerHTML = '';
+
+  if (tarjetas.length === 0) {
+    selectLider.innerHTML = '<option value="">Agrega integrantes primero...</option>';
+    return;
+  }
+
+  selectLider.innerHTML = '<option value="">Selecciona...</option>';
+  tarjetas.forEach(tarjeta => {
+    const apellidos = tarjeta.querySelector('.campo-apellidos').value.trim();
+    const nombres = tarjeta.querySelector('.campo-nombres').value.trim();
+    const nombreCompleto = `${apellidos} ${nombres}`.trim();
+    if (nombreCompleto) {
+      const opcion = document.createElement('option');
+      opcion.value = nombreCompleto;
+      opcion.textContent = nombreCompleto;
+      selectLider.appendChild(opcion);
+    }
+  });
+
+  // Restaurar selección previa si el nombre sigue en la lista
+  if ([...selectLider.options].some(o => o.value === valorPrevio)) {
+    selectLider.value = valorPrevio;
+  }
+}
+
+// Escuchar cambios en apellidos/nombres de cualquier integrante (delegación de eventos)
+listaIntegrantes.addEventListener('input', (e) => {
+  if (e.target.classList.contains('campo-apellidos') || e.target.classList.contains('campo-nombres')) {
+    actualizarSelectLider();
+  }
+});
+
+// ---- Autoidentificación en cascada ----
+const chkIndigena = document.getElementById('chkIndigena');
+const bloqueNacionalidad = document.getElementById('bloqueNacionalidad');
+const chkKichwaAndino = document.getElementById('chkKichwaAndino');
+const bloquePuebloKichwa = document.getElementById('bloquePuebloKichwa');
+
+chkIndigena.addEventListener('change', () => {
+  bloqueNacionalidad.style.display = chkIndigena.checked ? 'block' : 'none';
+  if (!chkIndigena.checked) {
+    document.querySelectorAll('.nacionalidad-check').forEach(c => c.checked = false);
+    bloquePuebloKichwa.style.display = 'none';
+    document.querySelectorAll('.pueblo-kichwa-check').forEach(c => c.checked = false);
+  }
+});
+
+chkKichwaAndino.addEventListener('change', () => {
+  bloquePuebloKichwa.style.display = chkKichwaAndino.checked ? 'block' : 'none';
+  if (!chkKichwaAndino.checked) {
+    document.querySelectorAll('.pueblo-kichwa-check').forEach(c => c.checked = false);
+  }
+});
+
+// ---- Colectivo nuevo: solo aplica si algún integrante está en ciclo 2 a 8 ----
+const bloqueColectivoNuevo = document.getElementById('bloqueColectivoNuevo');
+const radioNuevoSi = document.getElementById('radioNuevoSi');
+const radioNuevoNo = document.getElementById('radioNuevoNo');
+const bloqueNombreColectivoAnterior = document.getElementById('bloqueNombreColectivoAnterior');
+const campoColectivoAnterior = document.getElementById('campoColectivoAnterior');
+
+function actualizarVisibilidadColectivoNuevo() {
+  const ciclos = [...listaIntegrantes.querySelectorAll('.campo-ciclo')].map(s => s.value);
+  const aplica = ciclos.some(c => c && c !== '1');
+  bloqueColectivoNuevo.style.display = aplica ? 'block' : 'none';
+  if (!aplica) {
+    radioNuevoSi.checked = false;
+    radioNuevoNo.checked = false;
+    bloqueNombreColectivoAnterior.style.display = 'none';
+    campoColectivoAnterior.value = '';
+  }
+}
+
+radioNuevoSi.addEventListener('change', () => {
+  bloqueNombreColectivoAnterior.style.display = 'block';
+});
+radioNuevoNo.addEventListener('change', () => {
+  bloqueNombreColectivoAnterior.style.display = 'none';
+  campoColectivoAnterior.value = '';
+});
+
+listaIntegrantes.addEventListener('change', (e) => {
+  if (e.target.classList.contains('campo-ciclo')) {
+    actualizarVisibilidadColectivoNuevo();
+  }
+});
+
+// ---- Población beneficiaria: cálculo de totales en vivo ----
+const rangos = ['r0_5', 'r6_11', 'r12_17', 'r18_25', 'r26_64', 'r65mas'];
+const camposPoblacion = document.querySelectorAll('.campo-poblacion');
+
+function actualizarTotalesPoblacion() {
+  rangos.forEach(rango => {
+    const hombres = parseInt(document.querySelector(`.campo-poblacion[data-sexo="hombres"][data-rango="${rango}"]`).value) || 0;
+    const mujeres = parseInt(document.querySelector(`.campo-poblacion[data-sexo="mujeres"][data-rango="${rango}"]`).value) || 0;
+    document.getElementById(`total_${rango}`).textContent = hombres + mujeres;
+  });
+}
+
+camposPoblacion.forEach(campo => {
+  campo.addEventListener('input', () => {
+    campo.value = campo.value.replace(/[^0-9]/g, '');
+    actualizarTotalesPoblacion();
+  });
+});
+
+// Agregar el primer integrante al cargar la página
+agregarIntegrante();
+actualizarSelectLider();
+
+function recolectarAutoidentificacion() {
+  const seleccionadas = [...document.querySelectorAll('.auto-check:checked')].map(c => c.value);
+  let nacionalidad = '';
+  let puebloKichwa = '';
+  if (seleccionadas.includes('Indígena')) {
+    const nacionalidades = [...document.querySelectorAll('.nacionalidad-check:checked')].map(c => c.value);
+    nacionalidad = nacionalidades.join('; ');
+    if (nacionalidades.includes('Kichwa Andino')) {
+      const pueblos = [...document.querySelectorAll('.pueblo-kichwa-check:checked')].map(c => c.value);
+      puebloKichwa = pueblos.join('; ');
+    }
+  }
+  return {
+    pueblo: seleccionadas.join('; '),
+    nacionalidad,
+    puebloKichwa
+  };
+}
+
+function recolectarPoblacion() {
+  const datos = {};
+  rangos.forEach(rango => {
+    const hombres = parseInt(document.querySelector(`.campo-poblacion[data-sexo="hombres"][data-rango="${rango}"]`).value) || 0;
+    const mujeres = parseInt(document.querySelector(`.campo-poblacion[data-sexo="mujeres"][data-rango="${rango}"]`).value) || 0;
+    datos[rango] = { hombres, mujeres };
+  });
+  return datos;
+}
+
+function recolectarDatos() {
+  const nombreColectivo = document.getElementById('nombreColectivo').value.trim();
+  const tarjetas = listaIntegrantes.querySelectorAll('.integrante-card');
+  const integrantes = [];
+
+  tarjetas.forEach(tarjeta => {
+    integrantes.push({
+      apellidos: tarjeta.querySelector('.campo-apellidos').value.trim(),
+      nombres: tarjeta.querySelector('.campo-nombres').value.trim(),
+      ciclo: tarjeta.querySelector('.campo-ciclo').value,
+      paralelo: tarjeta.querySelector('.campo-paralelo').value,
+      comunidad: tarjeta.querySelector('.campo-comunidad').value.trim(),
+      parroquia: tarjeta.querySelector('.campo-parroquia').value.trim(),
+      canton: tarjeta.querySelector('.campo-canton').value.trim(),
+      provincia: tarjeta.querySelector('.campo-provincia').value
+    });
+  });
+
+  const autoid = recolectarAutoidentificacion();
+  const poblacion = recolectarPoblacion();
+
+  const grupo = {
+    lider: document.getElementById('selectLider').value,
+    liderTelefono: document.getElementById('liderTelefono').value.trim(),
+    comunidadNombre: document.getElementById('nombreComunidad').value.trim(),
+    comunidadUbicacion: document.getElementById('comunidadUbicacion').value.trim(),
+    comunidadParroquia: document.getElementById('comunidadParroquia').value.trim(),
+    comunidadCanton: document.getElementById('comunidadCanton').value.trim(),
+    comunidadProvincia: document.getElementById('comunidadProvincia').value,
+    comunidadArea: document.getElementById('comunidadArea').value,
+    autoidPueblo: autoid.pueblo,
+    autoidNacionalidad: autoid.nacionalidad,
+    autoidPuebloKichwa: autoid.puebloKichwa,
+    repNombre: document.getElementById('repNombre').value.trim(),
+    repCargo: document.getElementById('repCargo').value.trim(),
+    repTelefono: document.getElementById('repTelefono').value.trim(),
+    repCorreo: document.getElementById('repCorreo').value.trim(),
+    situacion: document.getElementById('campoSituacion').value.trim(),
+    tema: document.getElementById('campoTema').value.trim(),
+    objetivo: document.getElementById('campoObjetivo').value.trim(),
+    colectivoNuevo: radioNuevoSi.checked ? 'si' : (radioNuevoNo.checked ? 'no' : ''),
+    colectivoAnterior: campoColectivoAnterior.value.trim(),
+    poblacion
+  };
+
+  return { nombreColectivo, integrantes, grupo };
+}
+
+function validar(datos) {
+  if (!datos.nombreColectivo) {
+    alert('Por favor ingresa el nombre del colectivo.');
+    return false;
+  }
+  for (let i = 0; i < datos.integrantes.length; i++) {
+    const it = datos.integrantes[i];
+    if (!it.apellidos || !it.nombres || !it.ciclo || !it.paralelo ||
+        !it.comunidad || !it.parroquia || !it.canton || !it.provincia) {
+      alert(`Falta completar datos del integrante ${i + 1}.`);
+      return false;
+    }
+  }
+
+  const g = datos.grupo;
+  if (!g.lider) {
+    alert('Selecciona el líder del colectivo.');
+    return false;
+  }
+  if (!g.liderTelefono) {
+    alert('Ingresa el número de teléfono del líder del colectivo.');
+    return false;
+  }
+  if (!g.comunidadNombre || !g.comunidadUbicacion || !g.comunidadParroquia ||
+      !g.comunidadCanton || !g.comunidadProvincia || !g.comunidadArea) {
+    alert('Completa todos los datos de la Comunidad de Aprendizaje.');
+    return false;
+  }
+  if (!g.autoidPueblo) {
+    alert('Selecciona al menos una opción de autoidentificación de la comunidad.');
+    return false;
+  }
+  if (g.autoidPueblo.includes('Indígena') && !g.autoidNacionalidad) {
+    alert('Selecciona la nacionalidad indígena.');
+    return false;
+  }
+  if (g.autoidNacionalidad.includes('Kichwa Andino') && !g.autoidPuebloKichwa) {
+    alert('Selecciona el pueblo Kichwa Andino.');
+    return false;
+  }
+  if (!g.repNombre || !g.repCargo || !g.repTelefono) {
+    alert('Completa los datos del representante de la comunidad.');
+    return false;
+  }
+  if (!g.situacion || !g.tema || !g.objetivo) {
+    alert('Completa la situación, el tema y el objetivo del Desafío.');
+    return false;
+  }
+  if (bloqueColectivoNuevo.style.display === 'block') {
+    if (!g.colectivoNuevo) {
+      alert('Indica si el colectivo es nuevo este ciclo.');
+      return false;
+    }
+    if (g.colectivoNuevo === 'si' && !g.colectivoAnterior) {
+      alert('Indica en qué colectivo estuviste el ciclo pasado.');
+      return false;
+    }
+  }
+  return true;
+}
+
+function generarCSV(datos) {
+  const encabezado = [
+    'Nombre_Colectivo','Apellidos','Nombres','Ciclo','Paralelo',
+    'Comunidad_Sector_Barrio_Integrante','Parroquia_Integrante','Canton_Integrante','Provincia_Integrante',
+    'Lider_Colectivo','Lider_Telefono',
+    'ComunidadAprendizaje_Nombre','ComunidadAprendizaje_Sector','ComunidadAprendizaje_Parroquia',
+    'ComunidadAprendizaje_Canton','ComunidadAprendizaje_Provincia','ComunidadAprendizaje_Area',
+    'Autoidentificacion_Pueblo','Autoidentificacion_Nacionalidad','Autoidentificacion_PuebloKichwa',
+    'Representante_Nombre','Representante_Cargo','Representante_Telefono','Representante_Correo',
+    'Situacion_Problema','Tema_Desafio','Objetivo',
+    'Colectivo_Nuevo','Colectivo_Anterior',
+    'Poblacion_Ninos0_5_H','Poblacion_Ninos0_5_M',
+    'Poblacion_Ninos6_11_H','Poblacion_Ninos6_11_M',
+    'Poblacion_Adolescentes12_17_H','Poblacion_Adolescentes12_17_M',
+    'Poblacion_Adultos18_25_H','Poblacion_Adultos18_25_M',
+    'Poblacion_Adultos26_64_H','Poblacion_Adultos26_64_M',
+    'Poblacion_AdultosMayores65mas_H','Poblacion_AdultosMayores65mas_M'
+  ];
+
+  const g = datos.grupo;
+  const p = g.poblacion;
+  const filas = datos.integrantes.map(it => [
+    datos.nombreColectivo, it.apellidos, it.nombres, it.ciclo, it.paralelo,
+    it.comunidad, it.parroquia, it.canton, it.provincia,
+    g.lider, g.liderTelefono,
+    g.comunidadNombre, g.comunidadUbicacion, g.comunidadParroquia, g.comunidadCanton, g.comunidadProvincia, g.comunidadArea,
+    g.autoidPueblo, g.autoidNacionalidad, g.autoidPuebloKichwa,
+    g.repNombre, g.repCargo, g.repTelefono, g.repCorreo,
+    g.situacion, g.tema, g.objetivo,
+    g.colectivoNuevo, g.colectivoAnterior,
+    p.r0_5.hombres, p.r0_5.mujeres,
+    p.r6_11.hombres, p.r6_11.mujeres,
+    p.r12_17.hombres, p.r12_17.mujeres,
+    p.r18_25.hombres, p.r18_25.mujeres,
+    p.r26_64.hombres, p.r26_64.mujeres,
+    p.r65mas.hombres, p.r65mas.mujeres
+  ]);
+  const todasLasFilas = [encabezado, ...filas];
+  return todasLasFilas.map(fila =>
+    fila.map(campo => `"${String(campo).replace(/"/g, '""')}"`).join(',')
+  ).join('\n');
+}
+
+function descargarCSV(csv, nombreArchivo) {
+  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = nombreArchivo;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// ---- Determinar tutor(es) de seguimiento según ciclo y paralelo de los integrantes ----
+function obtenerTutores(integrantes) {
+  const tutores = new Set();
+  let hayCicloSinTutor = false;
+
+  integrantes.forEach(it => {
+    const ciclo = parseInt(it.ciclo, 10);
+    const paralelo = it.paralelo;
+
+    if (ciclo === 1 || ciclo === 2) {
+      tutores.add('luis.tupac@uaw.edu.ec');
+    } else if (ciclo === 3 || ciclo === 4) {
+      tutores.add('washikiat.tsere@uaw.edu.ec');
+    } else if (ciclo === 5) {
+      if (paralelo === 'A') {
+        tutores.add('washikiat.tsere@uaw.edu.ec');
+      } else if (paralelo === 'B' || paralelo === 'C') {
+        tutores.add('genesis.anangono@uaw.edu.ec');
+      }
+    } else if (ciclo >= 6 && ciclo <= 8) {
+      hayCicloSinTutor = true;
+    }
+  });
+
+  return { tutores: [...tutores], hayCicloSinTutor };
+}
+
+function construirCorreo(datos) {
+  const destinatario = 'vinculacion.lyc@uaw.edu.ec';
+  const { tutores, hayCicloSinTutor } = obtenerTutores(datos.integrantes);
+
+  const listaIntegrantesTexto = datos.integrantes
+    .map(it => `- ${it.apellidos} ${it.nombres} (Ciclo ${it.ciclo}, Paralelo ${it.paralelo})`)
+    .join('\n');
+
+  let cuerpo = `Registro de Desafío Comunitario\n\n`;
+  cuerpo += `Colectivo: ${datos.nombreColectivo}\n`;
+  cuerpo += `Líder: ${datos.grupo.lider}\n\n`;
+  cuerpo += `Integrantes:\n${listaIntegrantesTexto}\n\n`;
+  cuerpo += `IMPORTANTE: Adjuntar el archivo CSV descargado (${'integrantes_' + datos.nombreColectivo.replace(/\s+/g, '_') + '.csv'}) antes de enviar este correo.\n`;
+
+  if (tutores.length > 0) {
+    cuerpo += `\n(Con copia a la tutora/el tutor de seguimiento del ciclo correspondiente.)\n`;
+  }
+  if (hayCicloSinTutor) {
+    cuerpo += `\nNota: hay integrante(s) de ciclo 6 a 8, para quienes aún no hay tutor de seguimiento asignado en el sistema.\n`;
+  }
+
+  const asunto = `Registro Desafío Comunitario - ${datos.nombreColectivo}`;
+
+  let mailto = `mailto:${destinatario}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
+  if (tutores.length > 0) {
+    mailto += `&cc=${encodeURIComponent(tutores.join(','))}`;
+  }
+  return mailto;
+}
+
+document.getElementById('btnEnviar').addEventListener('click', () => {
+  const datos = recolectarDatos();
+  if (!validar(datos)) return;
+
+  const csv = generarCSV(datos);
+  const nombreArchivo = `integrantes_${datos.nombreColectivo.replace(/\s+/g, '_')}.csv`;
+  descargarCSV(csv, nombreArchivo);
+
+  const mailtoLink = construirCorreo(datos);
+
+  const mensaje = document.getElementById('mensajeEstado');
+  mensaje.className = 'exito';
+  mensaje.innerHTML = `Registro descargado como CSV. Se abrirá tu correo (Outlook) con el destinatario y el tutor ya listos &mdash; <strong>recuerda adjuntar el archivo CSV descargado</strong> antes de enviarlo.`;
+
+  // Pequeña espera para que la descarga del CSV se inicie antes de abrir el cliente de correo
+  setTimeout(() => {
+    window.location.href = mailtoLink;
+  }, 400);
+});
+</script>
+</body>
+</html>
